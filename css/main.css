@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "dekko";
+  src: url("../font/dekko.ttf");
+}
+
 * {
   margin: 0rem;
   padding: 0rem;

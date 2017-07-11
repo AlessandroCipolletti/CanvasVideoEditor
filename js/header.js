@@ -22,14 +22,15 @@
 
   function _initDom () {
 
-    _container = Utils.createDom("habillage-header__container");
-    var logo = document.createElement("div");
-    logo.classList.add("habillage-header__logo");
-    _container.appendChild(logo);
-    _container.addEventListener(Param.eventStart, Utils.preventDefault);
-    _container.addEventListener(Param.eventMove, Utils.preventDefault);
-    Param.container.appendChild(_container);
-    // Main.addRotationHandler(_onRotate);
+    Main.loadTemplate("header", {
+      name: app.NAME
+    }, Param.container, function (templateDom) {
+
+      templateDom.addEventListener(Param.eventStart, Utils.preventDefault);
+      templateDom.addEventListener(Param.eventMove, Utils.preventDefault);
+      // Main.addRotationHandler(_onRotate);
+
+    });
 
   }
 

@@ -4,6 +4,7 @@
   height: 5rem; /* 100px */
   top: 0rem;
   left: 0rem;
+  text-align: center;
   border-bottom: solid 0.05rem gray;
   background-image: url("../img/headerBG.png");
   background-size: contain;
@@ -13,11 +14,12 @@
 }
 
 .habillage-header__logo {
-  height: 100%;
-  width: 25rem; /* 500px */
+  font-family: "dekko";
+  color: white;
+  height: 75%;
+  font-size: 2.5rem;
+  font-weight: 0;
+  letter-spacing: 4px;
+  width: 25rem;
   margin: auto;
-  background-image: url("../img/logo.png");
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
 }
