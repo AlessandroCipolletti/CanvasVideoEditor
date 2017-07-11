@@ -1,0 +1,7 @@
+canvas {
+  position: absolute;
+  left:0px;
+  bottom: 0px;
+  cursor: pointer;
+  background-image: url(../img/bg.png);
+}

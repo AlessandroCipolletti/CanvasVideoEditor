@@ -1,0 +1,122 @@
+* {
+  margin: 0rem;
+  padding: 0rem;
+  font-family: sans-serif;
+  letter-spacing: 0.05rem;
+  user-select: none;
+  opacity: 1;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Chrome/Safari/Opera */
+          user-select: none;
+}
+
+html, body {
+  position: fixed;
+  margin: 0rem;
+  padding: 0rem;
+  width: 100%;
+  height: 100%;
+  top: 0rem;
+  left: 0rem;
+}
+
+.habillage__container {
+  position: absolute;
+  left: 0rem;
+  top: 0rem;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.disabled {
+  opacity: 0.3 !important;
+  cursor: auto !important;
+}
+.disabled a {
+  color: grey;
+}
+
+.displayNone {
+  display: none;
+}
+
+.fadeIn {
+  opacity: 1;
+  transition: opacity 250ms;
+}
+.fadeOut {
+  opacity: 0;
+  transition: opacity 250ms;
+}
+.popup {
+  z-index: 300;
+}
+
+.habillage__overlay-spinner {
+  background-color: rgba(66, 66, 66, 0.7);
+  /*background-color: rgba(146, 84, 255, 0.2);*/
+  width: 100%;
+  height: 100%;
+  top: 0rem;
+  left: 0rem;
+  opacity: 0.8;
+  z-index: 500;
+  position: absolute;
+}
+.habillage__overlay-spinner-image {
+  position: absolute;
+  width: 4.5rem;  /* 90px */
+  height: 4.5rem;  /* 90px */
+  left: 50%;
+  top: 50%;
+  margin-top: -2.25rem;    /* -45px */
+  margin-left: -2.25rem;  /* -45px */
+}
+
+.habillage__popup-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  width: 100%;
+  height: 100%;
+  top: 0rem;
+  left: 0rem;
+  position: absolute;
+}
+
+.button {
+  font-size: 1.5rem;  /* 30px */
+  padding: 0.8rem 1rem;  /* 16px 20px */
+  border: solid 0.1rem #186f8f;
+  box-shadow: inset 0rem 0.1rem 0rem #7fd2f1, 0rem 0.1rem 0rem #fff;
+  background-color:#3bb3e0;
+  cursor: pointer;
+  text-decoration:none;
+  color:#fff;
+  position: relative;
+  border-radius: 0.6rem;  /* 12px */
+  background-image: linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
+}
+.button:active {
+  background-image: linear-gradient(bottom, rgb(62,184,229) 0%, rgb(44,160,202) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(62,184,229) 0%, rgb(44,160,202) 100%);
+}
+.button.disabled:active {
+  background-image: linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
+}
+.button img {
+  height: 1.6rem;  /* 36px */
+  width: 1.6rem;  /* 36px */
+  margin: 0rem 0.6rem -0.5rem -0.3rem;
+}
+
+.habillage-panel-content {
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 0rem;
+  left: 0rem;
+}

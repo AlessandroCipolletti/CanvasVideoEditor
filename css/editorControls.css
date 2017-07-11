@@ -1,0 +1,55 @@
+.habillage-editor__controls-slider {
+  width: 90%;
+  left: 5%;
+  border: solid 0.2rem rgb(180, 180, 180);
+  height: 3rem;
+  margin-left: -0.2rem;
+  border-radius: 2rem;
+  background-color: white;
+  position: absolute;
+}
+  .habillage-editor__controls-slider-cursor {
+    width: 2rem;
+    height: 2rem;
+    margin: 0.5rem;
+    border-radius: 2rem;
+    background-color: #555;
+    cursor: pointer;
+    position: relative;
+    top: 0px;
+  }
+    .habillage-editor__controls-slider-cursor-tooltip {
+      position: relative;
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      top: 4rem;
+      width: 6.5rem;
+      height: 2.5rem;
+      border: solid 0.1rem rgb(180, 180, 180);
+      background-color: white;
+      text-align: center;
+    }
+    .habillage-editor__controls-slider-cursor-tooltip:after{
+      border: solid;
+      border-color: white transparent;
+      border-width: 0rem 1rem 1rem 1rem;
+      bottom: 100%;
+      content: "";
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      position: absolute;
+    }
+    .habillage-editor__controls-slider-cursor-tooltip:before{
+      border: solid;
+      border-color: rgb(150, 150, 150) transparent;
+      border-width: 0rem 1.1rem 1.1rem 1.1rem;
+      bottom: 100%;
+      content: "";
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      position: absolute;
+    }
+      .habillage-editor__controls-slider-cursor-tooltip-value {
+        font-size: 1.3rem;
+        line-height: 2.5rem;
+      }
