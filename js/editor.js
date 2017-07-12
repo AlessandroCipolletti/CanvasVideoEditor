@@ -20,7 +20,7 @@
     fps: 1,
     duration: 0,
     importMode: "sure", // sure or fast
-    backgroundToolMode: "cippo", // cippo or chroma
+    backgroundToolMode: "chroma", // cippo or chroma
     previewWidth: 640,
     previewHeight: 360,
     resolution: {   // selected video resolution, to update onload
