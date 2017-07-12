@@ -32,12 +32,6 @@
 
   }
 
-  function setFrame (frame) {
-    // called by editor after preview canvas traitment
-    // draw frame TODO
-    // save frame in _frames // TODO to check if best in reference or value
-  }
-
   function previus () {
     if (_currentIndex > 0) {
       _setIndex(_currentIndex - 1);
@@ -79,7 +73,7 @@
   }
 
   function _drawCanvas (indexCanvas, indexFrame) {
-    _canvas.ctx.drawImage(_frames[indexFrame].data, indexCanvas * _frameWidth, 0, _frameWidth, _canvas.height);
+    _canvas.ctx.drawImage(_frames[indexFrame].canvas, indexCanvas * _frameWidth, 0, _frameWidth, _canvas.height);
   }
 
   function _canvasClick (e) {
@@ -142,7 +136,6 @@
     init,
     setConfig,
     loadFrames,
-    setFrame,
     previus,
     next,
     setIndex

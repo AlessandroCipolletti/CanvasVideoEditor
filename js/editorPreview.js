@@ -21,24 +21,27 @@
   };
 
   var _canvas = {}, _context = {};
-  var _currentFrameIndex = -1, _offsetLeft = 0, _offsetTop = 0;
+  var _currentFrameIndex = -1, _offsetLeft = 0, _offsetTop = 0, _offsetWidth = 0, _offsetHeight = 0;
 
-  function setFrame (frame) {
+  function setFrame (frame, force) {
 
-    if (_currentFrameIndex !== frame.index) {
+    if (force || _currentFrameIndex !== frame.index) {
       _currentFrameIndex = frame.index;
-      _context.drawImage(frame.data, 0, 0, _canvas.width, _canvas.height);
+      _context.clearRect(0, 0, _canvas.width, _canvas.height);
+      _context.drawImage(frame.canvas, 0, 0, _canvas.width, _canvas.height);
     }
 
   }
 
   function _onCanvasClick (e) {
 
-    // var touches = Utils.filterTouchesByTarget(e, [_canvas]);
-    // var cursorX = Utils.getEventCoordX(touches, _offsetLeft, true);
-    // var cursorY = Utils.getEventCoordY(touches, _offsetTop, true);
-    // Editor.setLoading(true);
-    // _bucketVideo(_cursorX, _cursorY);
+    var touches = Utils.filterTouchesByTarget(e, [_canvas]);
+    var cursorX = Utils.getEventCoordX(touches, _offsetLeft, true);
+    var cursorY = Utils.getEventCoordY(touches, _offsetTop, true);
+    Editor.previewClick(
+      MATH.round(cursorX / _offsetWidth * _config.resolution.w),
+      MATH.round(cursorY / _offsetHeight * _config.resolution.h)
+    );
 
   }
 
@@ -60,6 +63,8 @@
       var canvasRect = _canvas.getBoundingClientRect();
       _offsetLeft = MATH.round(canvasRect.left);
       _offsetTop = MATH.round(canvasRect.top);
+      _offsetWidth = MATH.round(canvasRect.width);
+      _offsetHeight = MATH.round(canvasRect.height);
       // Main.addRotationHandler(_onRotate);
 
     });
