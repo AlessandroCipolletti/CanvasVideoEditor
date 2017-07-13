@@ -125,11 +125,6 @@
       return MATH.sqrt(pow(d - a, 2) + pow(e - b, 2) + pow(f - c, 2))
     };
     var imageData, data32, clampedArray;
-    var labColor;
-    var dEScore;
-    var r, g, b;
-    var x, y;
-    var pixel;
 
     var rgbToLab = function (r, g, b) {
       var xyz = rgbToXyz(r, g, b);
@@ -207,57 +202,22 @@
 
     var doFrame = function () {
       // use Uint32Array for performance
+      var r, g, b, labColor, pixel;
       imageData = _context.getImageData(0, 0, _canvasWidth, _canvasHeight);
       data32 = new Uint32Array(imageData.data.buffer);
       clampedArray = new Uint8ClampedArray(data32.buffer)
-
-      for (y = 0; y < _canvasHeight; ++y) {
-        for (x = 0; x < _canvasWidth; ++x) {
-          pixel = data32[y * _canvasWidth + x];
-          r = (pixel) & 0xff;
-          g = (pixel >> 8) & 0xff;
-          b = (pixel >> 16) & 0xff;
-          labColor = rgbToLab(r, g, b);
-
-          // test light green
-          dEScore = dE76(
-            labColor[0],labColor[1],labColor[2],
-            89, -99, 79
-          );
-          if (dEScore < 70) {
-            data32[y * _canvasWidth + x] =
-              (255 << 24) |
-              (0 << 16) |
-              (0 << 8) |
-              MATH.floor(MATH.random() * (255 - 1 + 1) + 1);
-            continue;
-          }
-          // test dark green
-          dEScore = dE76(
-            labColor[0], labColor[1], labColor[2],
-            44, -40, 43
-          );
-          if (dEScore < 24) {
-            data32[y * _canvasWidth + x] =
-              (255 << 24) |
-              (0 << 16) |
-              (0 << 8) |
-              MATH.floor(MATH.random() * (255 - 1 + 1) + 1);
-            continue;
-          }
-          // test middle green
-          dEScore = dE76(
-            labColor[0], labColor[1], labColor[2],
-            68, -43, 53
-          );
-          if (dEScore < 13) {
-            data32[y * _canvasWidth + x] =
-              (255 << 24) |
-              (0 << 16) |
-              (0 << 8) |
-              MATH.floor(MATH.random() * (255 - 1 + 1) + 1);
-            // continue;
-          }
+      for (var i = _canvasWidth * _canvasHeight; i--; ) {
+        pixel = data32[i];
+        r = (pixel) & 0xff;
+        g = (pixel >> 8) & 0xff;
+        b = (pixel >> 16) & 0xff;
+        labColor = rgbToLab(r, g, b); // very slow
+        if (
+          dE76(labColor[0], labColor[1], labColor[2], 89, -99, 79) < 70 || // test light green
+          dE76(labColor[0], labColor[1], labColor[2], 44, -40, 43) < 24 || // test dark green
+          dE76(labColor[0], labColor[1], labColor[2], 68, -43, 53) < 13    // test middle green
+        ) {
+          data32[i] = 0;
         }
       }
       imageData.data.set(clampedArray);
@@ -270,28 +230,31 @@
 
   var dog = (function () {
 
-    var imageData, resultData, r, g, b, a, tolerance = 70;
+    var imageData, resultData, imageData32, resultData32, r, g, b, a, tolerance = 70;
 
     var doFrame = function () {
 
+      var pixel;
+      imageData = _context.getImageData(0, 0, _canvasWidth, _canvasHeight);
+      imageData32 = new Uint32Array(imageData.data.buffer);
       resultData = _context.createImageData(_canvasWidth, _canvasHeight);
-      imageData = _context.getImageData(0, 0, _canvasWidth, _canvasHeight).data;
-      for (var i = 0, l = _canvasWidth * _canvasHeight * 4; i < l; i += 4) {
-        r = imageData[i + 0];
-        g = imageData[i + 1];
-        b = imageData[i + 2];
-        a = imageData[i + 3];
+      resultData32 = new Uint32Array(resultData.data.buffer);
+      for (var i = _canvasWidth * _canvasHeight; i--; ) {
+        pixel = imageData32[i];
+        r = pixel & 0xff;
+        g = (pixel >> 8) & 0xff;
+        b = (pixel >> 16) & 0xff;
+        a = (pixel >> 24) & 0xff;
         if (
       		abs(_targetColor[0] - r) > tolerance ||
       		abs(_targetColor[1] - g) > tolerance ||
       		abs(_targetColor[2] - b) > tolerance
+          // || abs(_targetColor[3] - a) > tolerance
       	) {
-          resultData.data[i + 0] = r;
-          resultData.data[i + 1] = g;
-          resultData.data[i + 2] = b;
-          resultData.data[i + 3] = a;
+          resultData32[i] = r | g << 8 | b << 16 | a << 24;
         }
       }
+      resultData.data.set(new Uint8ClampedArray(resultData32.buffer));
       _context.putImageData(resultData, 0, 0);
 
     };

@@ -51,10 +51,8 @@
 
   function previewClick (x, y) {
 
-    // console.log("preview click", x, y);
     if (_videoLoaded) {
       _toolIsWorking = true;
-      var args = [];
       var fn = Tools.Bucket[_config.backgroundToolMode];
       setLoading(true, true, "Bucket...", fn.bind.apply(fn, [{}].concat([_frames, x, y, _currentFrameIndex, _toolCallback])));
     }
