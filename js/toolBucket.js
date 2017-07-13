@@ -7,10 +7,10 @@
   var abs = MATH.abs, pow = MATH.pow;
   var _frames = [], _canvasWidth = 0, _canvasHeight = 0, _context = {}, _callback = {}, _startTime = 0, _index = 0, _framesNumber = 0,  _targetColor = [], _coordX = 0, _coordY = 0;
 
-  var _doWork = function (doFrame) {
+  var __doWork = function (doFrame) {
 
     if (_index < _framesNumber) {
-      requestAnimationFrame(_doWork);
+      requestAnimationFrame(__doWork);
       _context = _frames[_index].canvas.getContext("2d");
       doFrame();
       _index++;
@@ -19,6 +19,28 @@
       console.log("ChromaKey effect in", new Date().getTime() - _startTime, "ms");
       _callback && _callback();
     }
+
+  };
+
+  var _doWork = function (doFrame, fs, x, y, currentFrameIndex, cb) {
+
+    _frames = fs;
+    _callback = cb;
+    _framesNumber = fs.length;
+    _coordX = x;
+    _coordY = y;
+    _index = 0;
+    _startTime = new Date().getTime();
+    var currentCanvas = _frames[currentFrameIndex].canvas;
+    _canvasWidth = currentCanvas.width;
+    _canvasHeight = currentCanvas.height;
+
+    var data = currentCanvas.getContext("2d").getImageData(0, 0, _canvasWidth, _canvasHeight).data;
+    var px = (MATH.floor(x) + MATH.floor(y) * _canvasWidth) * 4;
+    _targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
+
+    __doWork = __doWork.bind({}, doFrame);
+    __doWork();
 
   };
 
@@ -93,27 +115,7 @@
 
     })();
 
-    return function (fs, x, y, currentFrameIndex, cb) {
-
-      _frames = fs;
-      _callback = cb;
-      _framesNumber = fs.length;
-      _coordX = x;
-      _coordY = y;
-      _index = 0;
-      _startTime = new Date().getTime();
-      var currentCanvas = _frames[currentFrameIndex].canvas;
-      _canvasWidth = currentCanvas.width;
-      _canvasHeight = currentCanvas.height;
-
-      var data = currentCanvas.getContext("2d").getImageData(0, 0, _canvasWidth, _canvasHeight).data;
-      var px = (MATH.floor(x) + MATH.floor(y) * _canvasWidth) * 4;
-      _targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
-
-      _doWork = _doWork.bind({}, doFrame);
-      _doWork();
-
-    };
+    return _doWork.bind({}, doFrame);
 
   })();
 
@@ -262,22 +264,7 @@
       _context.putImageData(imageData, 0, 0);
     };
 
-    return function (fs, cb) {
-
-      _frames = fs;
-      _callback = cb;
-      _framesNumber = fs.length;
-      _index = 0;
-      _startTime = new Date().getTime();
-
-      var canvas = _frames[0].canvas;
-      _canvasWidth = canvas.width;
-      _canvasHeight = canvas.height;
-
-      _doWork = _doWork.bind({}, doFrame);
-      _doWork();
-
-    };
+    return _doWork.bind({}, doFrame);
 
   })();
 
@@ -309,27 +296,7 @@
 
     };
 
-    return function (fs, x, y, currentFrameIndex, cb) {
-
-      _frames = fs;
-      _callback = cb;
-      _framesNumber = fs.length;
-      _coordX = x;
-      _coordY = y;
-      _index = 0;
-      _startTime = new Date().getTime();
-      var currentCanvas = _frames[currentFrameIndex].canvas;
-      _canvasWidth = currentCanvas.width;
-      _canvasHeight = currentCanvas.height;
-
-      var data = currentCanvas.getContext("2d").getImageData(0, 0, _canvasWidth, _canvasHeight).data;
-      var px = (MATH.floor(x) + MATH.floor(y) * _canvasWidth) * 4;
-      _targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
-
-      _doWork = _doWork.bind({}, doFrame);
-      _doWork();
-
-    };
+    return _doWork.bind({}, doFrame);
 
   })();
 

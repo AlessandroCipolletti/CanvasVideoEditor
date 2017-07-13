@@ -56,13 +56,7 @@
       _toolIsWorking = true;
       var args = [];
       var fn = Tools.Bucket[_config.backgroundToolMode];
-      if (["cippo", "dog"].indexOf(_config.backgroundToolMode) >= 0) {
-        args = [_frames, x, y, _currentFrameIndex, _toolCallback];
-      } else {
-        args = [_frames, _toolCallback];
-      }
-      setLoading(true, true, "Bucket...", fn.bind.apply(fn, [{}].concat(args)));
-
+      setLoading(true, true, "Bucket...", fn.bind.apply(fn, [{}].concat([_frames, x, y, _currentFrameIndex, _toolCallback])));
     }
 
   }
