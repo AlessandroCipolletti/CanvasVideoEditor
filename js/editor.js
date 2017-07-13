@@ -20,9 +20,9 @@
     fps: 1,
     duration: 0,
     importMode: "sure", // sure or fast
-    backgroundToolMode: "chroma", // cippo or chroma
-    previewWidth: 640,
-    previewHeight: 360,
+    backgroundToolMode: "dog", // cippo or chroma or dog
+    previewWidth: 800,
+    previewHeight: 450,
     resolution: {   // selected video resolution, to update onload
       w: 640,
       h: 360
@@ -56,7 +56,7 @@
       _toolIsWorking = true;
       var args = [];
       var fn = Tools.Bucket[_config.backgroundToolMode];
-      if (_config.backgroundToolMode === "cippo") {
+      if (["cippo", "dog"].indexOf(_config.backgroundToolMode) >= 0) {
         args = [_frames, x, y, _currentFrameIndex, _toolCallback];
       } else {
         args = [_frames, _toolCallback];

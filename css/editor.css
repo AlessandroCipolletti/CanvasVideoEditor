@@ -79,6 +79,7 @@
 .habillage-editor__input {
   position: absolute;
   left: 50%;
-  top: 450px;
+  top: 500px;
   transform: translate3d(-50%, 10px, 0);
+  z-index: 1000;
 }

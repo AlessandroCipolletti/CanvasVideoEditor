@@ -4,16 +4,17 @@
   var MATH = Math;
   var Editor = {};
 
-  var _frames = [], _canvasWidth = 0, _canvasHeight = 0, _context = {}, _callback = {}, _startTime = 0, _index = 0, _framesNumber = 0;
+  var abs = MATH.abs, pow = MATH.pow;
+  var _frames = [], _canvasWidth = 0, _canvasHeight = 0, _context = {}, _callback = {}, _startTime = 0, _index = 0, _framesNumber = 0,  _targetColor = [], _coordX = 0, _coordY = 0;
 
   var _doWork = function (doFrame) {
 
     if (_index < _framesNumber) {
+      requestAnimationFrame(_doWork);
       _context = _frames[_index].canvas.getContext("2d");
       doFrame();
       _index++;
       Editor.setProgressbar(MATH.round(_index * 100 / _framesNumber));
-      requestAnimationFrame(_doWork);
     } else {
       console.log("ChromaKey effect in", new Date().getTime() - _startTime, "ms");
       _callback && _callback();
@@ -21,44 +22,24 @@
 
   };
 
-
   var cippo = (function () {
 
-    var coordX = 0, coordY = 0, targetColor = [];
-    var abs = MATH.abs;
     var doFrame = (function () {
 
       var tolerance = 50;
-      var pixelCompare = function (i, targetColor, fillcolor, data, length, tolerance) {
+      var pixelCompare = function (i, _targetColor, fillcolor, data, length, tolerance) {
       	if (i < 0 || i >= length) return false; //out of bounds
-      	if (data[i + 3] === 0 && fillcolor.a > 0) return (targetColor[3] === 0);  //surface is invisible and fill is visible
-
       	if (
-      		abs(targetColor[3] - fillcolor.a) <= tolerance &&
-      		abs(targetColor[0] - fillcolor.r) <= tolerance &&
-      		abs(targetColor[1] - fillcolor.g) <= tolerance &&
-      		abs(targetColor[2] - fillcolor.b) <= tolerance
-      	) return false; //target is same as fill
-
-      	if (
-      		(targetColor[3] === data[i + 3]) &&
-      		(targetColor[0] === data[i]) &&
-      		(targetColor[1] === data[i + 1]) &&
-      		(targetColor[2] === data[i + 2])
-      	) return true; //target matches surface
-
-      	if (
-      		abs(targetColor[3] - data[i + 3]) <= (255 - tolerance) &&
-      		abs(targetColor[0] - data[i]) <= tolerance &&
-      		abs(targetColor[1] - data[i + 1]) <= tolerance &&
-      		abs(targetColor[2] - data[i + 2]) <= tolerance
+      		abs(_targetColor[3] - data[i + 3]) <= (255 - tolerance) &&
+      		abs(_targetColor[0] - data[i]) <= tolerance &&
+      		abs(_targetColor[1] - data[i + 1]) <= tolerance &&
+      		abs(_targetColor[2] - data[i + 2]) <= tolerance
       	) return true; //target to surface within tolerance
-
       	return false; //no match
       };
 
-      var pixelCompareAndSet = function (i, targetColor, fillcolor, data, length, tolerance) {
-      	if(pixelCompare(i, targetColor, fillcolor, data, length, tolerance)) {
+      var pixelCompareAndSet = function (i, _targetColor, fillcolor, data, length, tolerance) {
+      	if(pixelCompare(i, _targetColor, fillcolor, data, length, tolerance)) {
       		//fill the color
       		data[i]   = fillcolor.r;
       		data[i+1] = fillcolor.g;
@@ -73,18 +54,21 @@
 
       return function () {
 
+        var targetColor = _targetColor;
+        var canvasWidth = _canvasWidth;
         var fillcolor = {
           r: 0,
           g: 0,
           b: 0,
           a: 0
         };
-        image = _context.getImageData(0, 0, _canvasWidth, _canvasHeight);
+        // TODO use Uint32Array for performance like chroma
+        image = _context.getImageData(0, 0, canvasWidth, _canvasHeight);
         data = image.data;
         length = data.length;
       	Q = [];
-      	e = w = i = (MATH.floor(coordX) + MATH.floor(coordY) * _canvasWidth) * 4;
-        w2 = _canvasWidth * 4;
+      	e = w = i = (MATH.floor(_coordX) + MATH.floor(_coordY) * canvasWidth) * 4;
+        w2 = canvasWidth * 4;
 
       	if(!pixelCompare(i, targetColor, fillcolor, data, length, tolerance)) { return false; }
       	Q.push(i);
@@ -114,8 +98,8 @@
       _frames = fs;
       _callback = cb;
       _framesNumber = fs.length;
-      coordX = x;
-      coordY = y;
+      _coordX = x;
+      _coordY = y;
       _index = 0;
       _startTime = new Date().getTime();
       var currentCanvas = _frames[currentFrameIndex].canvas;
@@ -124,7 +108,7 @@
 
       var data = currentCanvas.getContext("2d").getImageData(0, 0, _canvasWidth, _canvasHeight).data;
       var px = (MATH.floor(x) + MATH.floor(y) * _canvasWidth) * 4;
-      targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
+      _targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
 
       _doWork = _doWork.bind({}, doFrame);
       _doWork();
@@ -135,7 +119,6 @@
 
   var chroma = (function () {
 
-    var pow = MATH.pow;
     var dE76 = function (a, b, c, d, e, f) {
       return MATH.sqrt(pow(d - a, 2) + pow(e - b, 2) + pow(f - c, 2))
     };
@@ -179,16 +162,11 @@
       _g = _g * 100;
       _b = _b * 100;
 
-      var X = _r * 0.4124 + _g * 0.3576 + _b * 0.1805;
-      var Y = _r * 0.2126 + _g * 0.7152 + _b * 0.0722;
-      var Z = _r * 0.0193 + _g * 0.1192 + _b * 0.9505;
-      return [X, Y, Z];
-
-      // return [
-      //   _r * 0.4124 + _g * 0.3576 + _b * 0.1805,
-      //   _r * 0.2126 + _g * 0.7152 + _b * 0.0722,
-      //   _r * 0.0193 + _g * 0.1192 + _b * 0.9505
-      // ];
+      return [
+        _r * 0.4124 + _g * 0.3576 + _b * 0.1805,
+        _r * 0.2126 + _g * 0.7152 + _b * 0.0722,
+        _r * 0.0193 + _g * 0.1192 + _b * 0.9505
+      ];
     };
 
     var xyzToLab = function (x, y, z) {
@@ -218,16 +196,11 @@
         _Z = (7.787 * _Z) + (16 / 116);
       }
 
-      var CIE_L = (116 * _Y) - 16;
-      var CIE_a = 500 * (_X - _Y);
-      var CIE_b = 200 * (_Y - _Z);
-      return [CIE_L, CIE_a, CIE_b];
-
-      // return [
-      //   (116 * _Y) - 16,
-      //   500 * (_X - _Y),
-      //   200 * (_Y - _Z)
-      // ];
+      return [
+        (116 * _Y) - 16,
+        500 * (_X - _Y),
+        200 * (_Y - _Z)
+      ];
     };
 
     var doFrame = function () {
@@ -308,6 +281,58 @@
 
   })();
 
+  var dog = (function () {
+
+    var imageData, resultData, r, g, b, a, tolerance = 70;
+
+    var doFrame = function () {
+
+      resultData = _context.createImageData(_canvasWidth, _canvasHeight);
+      imageData = _context.getImageData(0, 0, _canvasWidth, _canvasHeight).data;
+      for (var i = 0, l = _canvasWidth * _canvasHeight * 4; i < l; i += 4) {
+        r = imageData[i + 0];
+        g = imageData[i + 1];
+        b = imageData[i + 2];
+        a = imageData[i + 3];
+        if (
+      		abs(_targetColor[0] - r) > tolerance ||
+      		abs(_targetColor[1] - g) > tolerance ||
+      		abs(_targetColor[2] - b) > tolerance
+      	) {
+          resultData.data[i + 0] = r;
+          resultData.data[i + 1] = g;
+          resultData.data[i + 2] = b;
+          resultData.data[i + 3] = a;
+        }
+      }
+      _context.putImageData(resultData, 0, 0);
+
+    };
+
+    return function (fs, x, y, currentFrameIndex, cb) {
+
+      _frames = fs;
+      _callback = cb;
+      _framesNumber = fs.length;
+      _coordX = x;
+      _coordY = y;
+      _index = 0;
+      _startTime = new Date().getTime();
+      var currentCanvas = _frames[currentFrameIndex].canvas;
+      _canvasWidth = currentCanvas.width;
+      _canvasHeight = currentCanvas.height;
+
+      var data = currentCanvas.getContext("2d").getImageData(0, 0, _canvasWidth, _canvasHeight).data;
+      var px = (MATH.floor(x) + MATH.floor(y) * _canvasWidth) * 4;
+      _targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
+
+      _doWork = _doWork.bind({}, doFrame);
+      _doWork();
+
+    };
+
+  })();
+
   function init () {
     Editor = app.Editor;
   }
@@ -315,7 +340,8 @@
   app.module("Tools.Bucket", {
     init,
     cippo,
-    chroma
+    chroma,
+    dog
   });
 
 })(APP);
