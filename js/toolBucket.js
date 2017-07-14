@@ -17,7 +17,7 @@
       Editor.setProgressbar(MATH.round(_index * 100 / _framesNumber));
     } else {
       console.log("ChromaKey effect in", new Date().getTime() - _startTime, "ms");
-      _callback && _callback();
+      _callback && _callback(true);
     }
 
   };
@@ -34,13 +34,15 @@
     var currentCanvas = _frames[currentFrameIndex].canvas;
     _canvasWidth = currentCanvas.width;
     _canvasHeight = currentCanvas.height;
-
     var data = currentCanvas.getContext("2d").getImageData(0, 0, _canvasWidth, _canvasHeight).data;
     var px = (MATH.floor(x) + MATH.floor(y) * _canvasWidth) * 4;
     _targetColor = [data[px], data[px + 1], data[px + 2], data[px + 3]];
-
-    __doWork = __doWork.bind({}, doFrame);
-    __doWork();
+    if (_targetColor[3] > 0) {
+      __doWork = __doWork.bind({}, doFrame);
+      __doWork();
+    } else {
+      _callback && _callback(false);
+    }
 
   };
 

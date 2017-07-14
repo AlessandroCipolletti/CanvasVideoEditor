@@ -33,19 +33,21 @@
   var _video = document.createElement('video'), _duration = 0;
   var _frames = [], _framesNumber = 0, _currentFrameIndex = 0;
   var _startTaskTime = 0;
-  var _videoLoaded = false, _toolIsWorking = false, _keyPressed = false;
+  var _videoLoaded = false, _toolIsWorking = false, _keyPressed = false, _isLoading = false;
 
   function _findFrameIndexByTime (time) {
     return MATH.min(MATH.max(MATH.round(time / _config.duration * _framesNumber), 0), _framesNumber - 1);
   }
 
-  function _toolCallback () {
+  function _toolCallback (done) {
 
     _toolIsWorking = false;
     setLoading(false);
-    Messages.success("Tool done !");
-    Preview.setFrame(_frames[_currentFrameIndex], true);
-    Thumbnails.setIndex(_currentFrameIndex, true);
+    if (done) {
+      Messages.success("Tool done !");
+      Preview.setFrame(_frames[_currentFrameIndex], true);
+      Thumbnails.setIndex(_currentFrameIndex, true);
+    }
 
   }
 
@@ -87,6 +89,7 @@
 
   function setLoading(loading, progressbar, message, callback) {
 
+    _isLoading = loading;
     if (loading) {
       _overlayMessage.innerHTML = message || "";
       if (progressbar) {
@@ -214,7 +217,7 @@
 
   function _onKeypress (e) {
 
-    if (_keyPressed === false && (e.keyCode === 37 || e.keyCode === 39)) {
+    if (_isLoading === false && _keyPressed === false && (e.keyCode === 37 || e.keyCode === 39)) {
       _keyPressed = true;
       if (e.keyCode === 37) {
         Thumbnails.previus();
