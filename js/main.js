@@ -165,6 +165,7 @@
 
     app.Messages.init();
     app.Header.init();
+    app.CaptureMediaPopup.init();
     app.Editor.init();
 
     _onRotate();

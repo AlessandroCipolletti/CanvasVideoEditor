@@ -14,6 +14,7 @@
   var Controls = {};
   var Thumbnails = {};
   var Tools = {};
+  var CaptureMediaPopup = {};
 
   var _polyfills = [];
   var _config = {
@@ -196,7 +197,7 @@
   function _onSelectVideo () {
 
     if (this.files && this.files[0]) {
-      Messages.panel(false);
+      Messages.closePanel();
       setLoading(true, true, "Importing video...");
       var file = this.files[0];
       var url = URL.createObjectURL(file);
@@ -243,20 +244,8 @@
       } else if (type === "micro") {
         Messages.info("TODO");
       } else if (type === "camera") {
-        Messages.panel(_captureMediaPopup, true, {
-          top: "50%",
-          width: "60rem",
-          height: "46rem"
-        });
 
-        navigator.getUserMedia({
-          video: true,
-          audio: true
-        }, function (stream) {
-          _captureMediaPopup.preview.src = URL.createObjectURL(stream);
-        }, function (e) {
-          console.log("error camera: ", e);
-        });
+        CaptureMediaPopup.show();
 
       }
 
@@ -332,11 +321,6 @@
       _addMediaPopup = _container.querySelector(".habillage-editor__add-media-popup");
       _addMediaPopup.parentNode.removeChild(_addMediaPopup);
       _addMediaPopup.addEventListener(Param.eventStart, _setInput, true);
-      _captureMediaPopup = _container.querySelector(".habillage-editor__capture-media-popup");
-      _captureMediaPopup.parentNode.removeChild(_captureMediaPopup);
-      _captureMediaPopup.preview = _captureMediaPopup.querySelector(".habillage-editor__capture-media-preview");
-      _captureMediaPopup.cameraButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-video");
-      _captureMediaPopup.videoButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-image");
 
       document.addEventListener("keydown", _onKeyDown);
       document.addEventListener("keyup", _onKeyUp);
@@ -365,6 +349,7 @@
     Preview = app.Editor.Preview;
     Controls = app.Editor.Controls;
     Thumbnails = app.Editor.Thumbnails;
+    CaptureMediaPopup = app.CaptureMediaPopup;
     _config = Utils.setConfig(params, _config);
     Utils.initWithPolyfills(_polyfills, _initDom);
 

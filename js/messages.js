@@ -18,7 +18,7 @@
 
   var _dom = {}, _overlay = {}, _message = {}, _confirmButton = {}, _cancelButton = {}, _panel = {}, _panelClose = {};
   var _stack = [];
-  var _isOpen = false, _autoCloseTimeout = false, _panelIsOpen = false, _currentIsMandatory = false;
+  var _isOpen = false, _autoCloseTimeout = false, _panelIsOpen = false, _currentIsMandatory = false, _callbackClosePanel = false;
 
   function _setType (type) {
 
@@ -166,14 +166,19 @@
 
   }
 
-  function panel (content, force, styles) {
+  function closePanel (callback) {
 
-    if (content === false) {
-      _closePanel();
-      return;
+    if (_panelIsOpen) {
+      Utils.fadeOutElements([_panel, _overlay], [callback, undefined]);
+      _panelIsOpen = false;
     }
+
+  }
+
+  function panel (content, force, styles, callbackOpen, callbackClose) {
+
+    _callbackClosePanel = callbackClose || false;
     if (force || _panelIsOpen === false) {
-      _panelIsOpen = true;
       content.classList.add("habillage-panel-content");
       if (styles) {
         _panel.style = "";
@@ -184,18 +189,12 @@
       _panel.innerHTML = "";
       // _panel.appendChild(_panelClose);
       _panel.appendChild(content);
-      Utils.fadeInElements([_panel, _overlay]);
-    } else {
-      _closePanel();
-    }
-
-  }
-
-  function _closePanel () {
-
-    if (_panelIsOpen) {
-      Utils.fadeOutElements([_panel, _overlay]);
-      _panelIsOpen = false;
+      if (_panelIsOpen === false) {
+        Utils.fadeInElements([_panel, _overlay], [callbackOpen, undefined]);
+      } else if (callbackOpen) {
+        setTimeout(callbackOpen, Param.fadeTransition);
+      }
+      _panelIsOpen = true;
     }
 
   }
@@ -233,7 +232,7 @@
       _panelClose.addEventListener(Param.eventStart, _panelCloseClick);
       _overlay.addEventListener(Param.eventStart, function (e) {
         e.preventDefault();
-        _closePanel();
+        closePanel(_callbackClosePanel);
       });
       Main.addRotationHandler(_onRotate);
 
@@ -252,14 +251,15 @@
   }
 
   app.module("Messages", {
-    init: init,
-    alert: alert,
-    info: info,
-    success: success,
-    error: error,
-    confirm: confirm,
-    input: input,
-    panel: panel
+    init,
+    alert,
+    info,
+    success,
+    error,
+    confirm,
+    input,
+    panel,
+    closePanel
   });
 
 })(APP);

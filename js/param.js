@@ -48,7 +48,9 @@
     param.supportTouch = ("ontouchstart" in window);
     param.supportGesture = ("ongesturechange" in window);
     param.supportOrientation = ("orientation" in window);
-
+    // CSS params
+    param.fadeTransition = 250;
+    
     if (param.supportTouch) {
 
       param.eventStart = "touchstart";

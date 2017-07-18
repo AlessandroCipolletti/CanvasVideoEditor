@@ -28,12 +28,6 @@
     </div>
   </div>
 
-  <div class="habillage-editor__capture-media-popup">
-    <video class="habillage-editor__capture-media-preview"></video>
-    <div class="habillage-editor__capure-media-video"></div>
-    <div class="habillage-editor__capure-media-image"></div>
-  </div>
-
   <div class="habillage-editor__preview-container">
 
   </div>
