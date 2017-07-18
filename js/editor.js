@@ -17,7 +17,7 @@
 
   var _polyfills = [];
   var _config = {
-    fps: 1,
+    fps: 2,
     duration: 0,
     importMode: "sure", // sure or fast
     backgroundToolMode: "dog", // cippo or chroma or dog
@@ -29,7 +29,10 @@
     }
   };
 
-  var _container = {}, _input = {}, _videoSpinner = {}, _previewContainer = {}, _controlsContainer = {}, _thumbnailsContainer = {}, _overlayMessage = {}, _progressbar = {}, _progressbarValue = {};
+  var _container = {}, _input = {}, _videoSpinner = {}, _previewContainer = {}, _controlsContainer = {}, _thumbnailsContainer = {}, _overlayMessage = {}, _progressbar = {}, _progressbarValue = {}, _addMediaButton = {}, _addMediaPopup = {};
+
+  var _captureMediaPopup = {};
+
   var _video = document.createElement('video'), _duration = 0;
   var _frames = [], _framesNumber = 0, _currentFrameIndex = 0;
   var _startTaskTime = 0;
@@ -124,16 +127,20 @@
 
   function _saveFrame () {
 
-    var hd = document.createElement("canvas");
-    var time = Utils.round(_video.currentTime, 3);
-    hd.width = _config.resolution.w;
-    hd.height = _config.resolution.h;
-    hd.getContext("2d").drawImage(_video, 0, 0, hd.width, hd.height);
-    _frames.push({
-      time: time,
-      canvas: hd,
-      index: _frames.length
-    });
+    if (_video) {
+      var hd = document.createElement("canvas");
+      var time = Utils.round(_video.currentTime, 3);
+      hd.width = _config.resolution.w;
+      hd.height = _config.resolution.h;
+      hd.getContext("2d").drawImage(_video, 0, 0, hd.width, hd.height);
+      setProgressbar(MATH.round(_video.currentTime * 100 / _video.duration));
+      _frames.push({
+        time: time,
+        canvas: hd,
+        index: _frames.length
+      });
+      // setTimeout(_saveFrame, 1000 / _config.fps);
+    }
 
   }
 
@@ -144,7 +151,6 @@
 
       currentTime = _video.currentTime;
       _saveFrame();
-      setProgressbar(MATH.round(currentTime * 100 / _config.duration));
       if (currentTime + (1 / _config.fps) <= _config.duration) {
         _video.currentTime = currentTime + (1 / _config.fps);
       } else {
@@ -156,8 +162,16 @@
     return function () {
 
       _frames = [];
+      //*
       _video.addEventListener("seeked", onVideoSeek);
       _video.currentTime = 0;
+      /*/
+      _video.addEventListener("timeupdate", _saveFrame);
+      _video.addEventListener("ended", _importCallback);
+      _video.currentTime = 0;
+      _video.muted = true;
+      _video.play();
+      //*/
 
     };
 
@@ -175,13 +189,14 @@
       _importCallback()
     });
     _video.play();
-    requestAnimationFrame(_saveFrame);
+    setTimeout(_saveFrame, 1000 / _config.fps);
 
   }
 
   function _onSelectVideo () {
 
     if (this.files && this.files[0]) {
+      Messages.panel(false);
       setLoading(true, true, "Importing video...");
       var file = this.files[0];
       var url = URL.createObjectURL(file);
@@ -211,20 +226,72 @@
 
   }
 
+  function _setInput (e) {
+
+    if (e.target.nodeName.toLowerCase() === "img") {
+      var type = e.target.parentNode.className;
+      type = type.substr(type.lastIndexOf("-") + 1, type.length);
+      if (type === "video") {
+        _input.setAttribute("accept", "video/*");
+        _input.click();
+      } else if (type === "audio") {
+        _input.setAttribute("accept", "audio/mp3");
+        _input.click();
+      } else if (type === "image") {
+        _input.setAttribute("accept", "image/*");
+        _input.click();
+      } else if (type === "micro") {
+        Messages.info("TODO");
+      } else if (type === "camera") {
+        Messages.panel(_captureMediaPopup, true, {
+          top: "50%",
+          width: "60rem",
+          height: "46rem"
+        });
+
+        navigator.getUserMedia({
+          video: true,
+          audio: true
+        }, function (stream) {
+          _captureMediaPopup.preview.src = URL.createObjectURL(stream);
+        }, function (e) {
+          console.log("error camera: ", e);
+        });
+
+      }
+
+    }
+
+  }
+
+  function _addMediaButtonClick (e) {
+
+    Messages.panel(_addMediaPopup, false, {
+      top: "40%",
+      width: "60rem",
+      height: "16rem"
+    });
+
+  }
+
+  function _onKeyUp (e) {
+    _keyPressed = false;
+  }
+
   function __onKeypress () {
     _keyPressed = false;
   }
 
-  function _onKeypress (e) {
+  function _onKeyDown (e) {
 
-    if (_isLoading === false && _keyPressed === false && (e.keyCode === 37 || e.keyCode === 39)) {
+    if (_isLoading === false && _videoLoaded && _keyPressed === false && (e.keyCode === 37 || e.keyCode === 39)) {
       _keyPressed = true;
       if (e.keyCode === 37) {
         Thumbnails.previus();
       } else {
         Thumbnails.next();
       }
-      requestAnimationFrame(__onKeypress);
+      // setTimeout(__onKeypress, 75);
     }
 
   }
@@ -245,7 +312,9 @@
   function _initDom () {
 
     Main.loadTemplate("editor", {
-      marginTop: Param.headerSize
+      marginTop: Param.headerSize,
+      importLabel: "Import",
+      captureLabel: "Capture"
     }, Param.container, function (templateDom) {
 
       _container = templateDom;
@@ -257,7 +326,20 @@
       _overlayMessage = _container.querySelector(".habillage-editor__overlay-message");
       _progressbar = _container.querySelector(".habillage-editor__progressbar");
       _progressbarValue = _container.querySelector(".habillage-editor__progressbar-value");
-      document.addEventListener("keydown", _onKeypress);
+
+      _addMediaButton = _container.querySelector(".habillage-editor__add-media-button");
+      _addMediaButton.addEventListener(Param.eventStart, _addMediaButtonClick);
+      _addMediaPopup = _container.querySelector(".habillage-editor__add-media-popup");
+      _addMediaPopup.parentNode.removeChild(_addMediaPopup);
+      _addMediaPopup.addEventListener(Param.eventStart, _setInput, true);
+      _captureMediaPopup = _container.querySelector(".habillage-editor__capture-media-popup");
+      _captureMediaPopup.parentNode.removeChild(_captureMediaPopup);
+      _captureMediaPopup.preview = _captureMediaPopup.querySelector(".habillage-editor__capture-media-preview");
+      _captureMediaPopup.cameraButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-video");
+      _captureMediaPopup.videoButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-image");
+
+      document.addEventListener("keydown", _onKeyDown);
+      document.addEventListener("keyup", _onKeyUp);
       _input.addEventListener("change", _onSelectVideo);
       _video.addEventListener("loadeddata", _onVideoLoad);
       _controlsContainer.style.width = _config.previewWidth + "px";

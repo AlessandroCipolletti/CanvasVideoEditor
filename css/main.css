@@ -88,9 +88,10 @@ html, body {
   position: absolute;
 }
 
+/*
 .button {
-  font-size: 1.5rem;  /* 30px */
-  padding: 0.8rem 1rem;  /* 16px 20px */
+  font-size: 1.5rem;
+  padding: 0.8rem 1rem;
   border: solid 0.1rem #186f8f;
   box-shadow: inset 0rem 0.1rem 0rem #7fd2f1, 0rem 0.1rem 0rem #fff;
   background-color:#3bb3e0;
@@ -98,7 +99,7 @@ html, body {
   text-decoration:none;
   color:#fff;
   position: relative;
-  border-radius: 0.6rem;  /* 12px */
+  border-radius: 0.6rem;
   background-image: linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
   background-image: -webkit-linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
 }
@@ -111,17 +112,26 @@ html, body {
   background-image: -webkit-linear-gradient(bottom, rgb(44,160,202) 0%, rgb(62,184,229) 100%);
 }
 .button img {
-  height: 1.6rem;  /* 36px */
-  width: 1.6rem;  /* 36px */
+  height: 1.6rem;
+  width: 1.6rem;
   margin: 0rem 0.6rem -0.5rem -0.3rem;
 }
+*/
 
 .habillage-panel-content {
-  width: 100%;
-  height: 100%;
+  /*width: 100%;
+  height: 100%;*/
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
-  position: absolute;
+  position: relative;
   top: 0rem;
   left: 0rem;
+}
+
+.habillage-editor-buttons {
+  display: inline-block;
+  width: 4rem;
+  height: 4rem;
+  margin: 0.5rem;
+  cursor: pointer;
 }

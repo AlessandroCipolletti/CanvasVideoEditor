@@ -76,7 +76,7 @@
     _canvas.ctx.drawImage(_frames[indexFrame].canvas, indexCanvas * _frameWidth, 0, _frameWidth, _canvas.height);
   }
 
-  function _canvasClick (e) {
+  function _onCanvasClick (e) {
 
     var touches = Utils.filterTouchesByTarget(e);
     var index = _currentIndex + MATH.trunc(touches[0].clientX / _frameWidth) - 2;
@@ -84,6 +84,10 @@
       _setIndex(index);
       Editor.setByFrame(_currentIndex);
     }
+
+  }
+
+  function _onKeyDown (e) {
 
   }
 
@@ -111,7 +115,8 @@
 
       _canvas = templateDom;
       _canvas.ctx = _canvas.getContext("2d");
-      _canvas.addEventListener(Param.eventStart, _canvasClick, true);
+      _canvas.addEventListener(Param.eventStart, _onCanvasClick, true);
+      document.addEventListener("keydown", _onKeyDown);
       Main.addRotationHandler(_onRotate);
       _onRotate();
 

@@ -237,6 +237,7 @@
     var doFrame = function () {
 
       var pixel;
+      var _abs = abs;
       imageData = _context.getImageData(0, 0, _canvasWidth, _canvasHeight);
       imageData32 = new Uint32Array(imageData.data.buffer);
       resultData = _context.createImageData(_canvasWidth, _canvasHeight);
@@ -248,10 +249,10 @@
         b = (pixel >> 16) & 0xff;
         a = (pixel >> 24) & 0xff;
         if (
-      		abs(_targetColor[0] - r) > tolerance ||
-      		abs(_targetColor[1] - g) > tolerance ||
-      		abs(_targetColor[2] - b) > tolerance
-          // || abs(_targetColor[3] - a) > tolerance
+      		_abs(_targetColor[0] - r) > tolerance ||
+      		_abs(_targetColor[1] - g) > tolerance ||
+      		_abs(_targetColor[2] - b) > tolerance
+          // || _abs(_targetColor[3] - a) > tolerance
       	) {
           resultData32[i] = r | g << 8 | b << 16 | a << 24;
         }

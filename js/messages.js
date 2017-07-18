@@ -166,16 +166,35 @@
 
   }
 
-  function panel (content) {
+  function panel (content, force, styles) {
 
-    if (_panelIsOpen === false) {
+    if (content === false) {
+      _closePanel();
+      return;
+    }
+    if (force || _panelIsOpen === false) {
       _panelIsOpen = true;
       content.classList.add("habillage-panel-content");
+      if (styles) {
+        _panel.style = "";
+        for (var k in styles) {
+          _panel.style[k] = styles[k];
+        }
+      }
       _panel.innerHTML = "";
-      _panel.appendChild(_panelClose);
+      // _panel.appendChild(_panelClose);
       _panel.appendChild(content);
       Utils.fadeInElements([_panel, _overlay]);
     } else {
+      _closePanel();
+    }
+
+  }
+
+  function _closePanel () {
+
+    if (_panelIsOpen) {
+      Utils.fadeOutElements([_panel, _overlay]);
       _panelIsOpen = false;
     }
 
@@ -214,6 +233,7 @@
       _panelClose.addEventListener(Param.eventStart, _panelCloseClick);
       _overlay.addEventListener(Param.eventStart, function (e) {
         e.preventDefault();
+        _closePanel();
       });
       Main.addRotationHandler(_onRotate);
 
