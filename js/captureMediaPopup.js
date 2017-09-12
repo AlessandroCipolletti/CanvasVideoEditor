@@ -16,8 +16,8 @@
 
   };
 
-  var _captureMediaPopup = {}, _snapCtx = {}, _cameraStream = {};
-  var _usingCamera = false, _isOpen = false, _captureModeVideo = false;
+  var _captureMediaPopup = {}, _snapCtx = {}, _mediaRecorder = {}, _cameraStream = {};
+  var _usingCamera = false, _isOpen = false, _captureModeVideo = false, _isVideoRecording = false;
 
   function __showDoms (doms) {
     doms.forEach(function (dom) {
@@ -33,18 +33,33 @@
 
   function _startTakeVideo (e) {
 
+    _isVideoRecording = true;
     _captureModeVideo = true;
     __hideDoms([_captureMediaPopup.videoButton, _captureMediaPopup.cameraButton]);
     __showDoms([_captureMediaPopup.stopButton]);
+    // _mediaRecorder.start(3000);
+    // _mediaRecorder.startRecording();
     // TODO
 
   }
 
-  function _stopTakeVideo (e) {
+  function _stopTakeVideo (notSave) {
 
-    __hideDoms([_captureMediaPopup.stopButton]);
-    __showDoms([_captureMediaPopup.rejectButton, _captureMediaPopup.doneButton]);
-    // TODO
+    if (_isVideoRecording) {
+      _isVideoRecording = false;
+      __hideDoms([_captureMediaPopup.stopButton]);
+      __showDoms([_captureMediaPopup.rejectButton, _captureMediaPopup.doneButton]);
+      // _mediaRecorder.stop();
+      // _mediaRecorder.stopRecording(function() {
+      //   console.log(URL.createObjectURL(this.blob));
+      //   var blob = this.getBlob();
+      //   console.log(blob);
+      // });
+      if (!notSave) {
+
+      }
+      // TODO
+    }
 
   }
 
@@ -54,6 +69,9 @@
     _captureMediaPopup.snap.width = _captureMediaPopup.preview.videoWidth;
     _captureMediaPopup.snap.height = _captureMediaPopup.preview.videoHeight;
     _snapCtx.drawImage(_captureMediaPopup.preview, 0, 0, _captureMediaPopup.snap.width, _captureMediaPopup.snap.height);
+    _captureMediaPopup.snap.toBlob(function (blob) {
+      console.log(URL.createObjectURL(blob))
+    }, "image/png");
     __hideDoms([_captureMediaPopup.preview, _captureMediaPopup.videoButton, _captureMediaPopup.cameraButton]);
     __showDoms([_captureMediaPopup.snap, _captureMediaPopup.rejectButton, _captureMediaPopup.doneButton]);
     _closeCamera();
@@ -94,7 +112,48 @@
       audio: true
     }, function (stream) {
       _cameraStream = stream;
+
       _captureMediaPopup.preview.src = URL.createObjectURL(stream);
+      _captureMediaPopup.preview.play();
+
+
+
+      // _mediaRecorder = RecordRTC(stream, {
+      //   type: "video",
+      //   recorderType: MediaStreamRecorder
+      // });
+      // _mediaRecorder.initRecorder();
+
+
+      // _mediaRecorder = new WhammyRecorder(stream);
+      // console.log(_mediaRecorder);
+      // debugger;
+      // _mediaRecorder.video = yourHTMLVideoElement;
+      // _mediaRecorder.onStartedDrawingNonBlankFrames = function() {
+      //   _mediaRecorder.clearOldRecordedFrames();
+      // };
+      // _mediaRecorder.onstop = function (blob) {
+      //   console.log(_mediaRecorder.getBlob());
+        // console.log("data available:", URL.createObjectURL(blob));
+        // video.src = URL.createObjectURL(blob);
+      // }
+      // _mediaRecorder.ondataavailable = function (blob) {
+      //   console.log("data available:", URL.createObjectURL(blob));
+      // };
+
+
+      // _mediaRecorder = new MediaStreamRecorder(stream);
+      // _mediaRecorder.videoWidth = _captureMediaPopup.preview.width;
+      // _mediaRecorder.videoHeight = _captureMediaPopup.preview.height;
+      // _mediaRecorder.stream = stream;
+      // _mediaRecorder.mimeType = "video/webm";
+      // _mediaRecorder.recorderType = WhammyRecorder;
+      //
+      // _mediaRecorder.ondataavailable = function (blob) {
+      //   console.log("data available:", URL.createObjectURL(blob));
+      // };
+      // _mediaRecorder.start(6000);
+
     }, function (e) {
       console.log("error camera: ", e);
     });
@@ -104,6 +163,9 @@
   function _closeCamera () {
 
     _usingCamera = false;
+    if (_isVideoRecording) {
+      _stopTakeVideo(true);
+    }
     _cameraStream.getTracks().forEach(function (track) {
       track.stop();
     });
@@ -118,7 +180,9 @@
         top: "50%",
         width: "60rem",
         height: "40rem"
-      }, _openCamera, hide);
+      }, function () {
+        setTimeout(_openCamera, 150);
+      }, hide);
     }
 
   }
@@ -150,6 +214,11 @@
       _captureMediaPopup.stopButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-stop");
       _captureMediaPopup.rejectButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-reject");
       _captureMediaPopup.doneButton = _captureMediaPopup.querySelector(".habillage-editor__capture-media-done");
+
+      _captureMediaPopup.preview.width = 1280;
+      _captureMediaPopup.preview.height = 720;
+      _captureMediaPopup.preview.muted = true;
+
       _captureMediaPopup.snap.width = 400 * Param.pixelRatio;
       _captureMediaPopup.snap.height = 300 * Param.pixelRatio;
       _snapCtx = _captureMediaPopup.snap.getContext("2d");
